@@ -1,1 +1,9 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.omiroskaseris.twa",
+        "sha256_cert_fingerprints": ["B7:29:EE:72:76:31:44:42:44:EB:5E:27:97:8F:8D:49:94:7C:53:BA:49:1A:7C:89:60:16:E9:B6:84:09:9E:7D"]
+      }
+    }]
 
