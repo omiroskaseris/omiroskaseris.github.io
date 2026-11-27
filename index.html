@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0f1419">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Λαχανικά Κύπρου | Hort Guide</title>
+<style>
+:root {
+  --bg: #0f1419;
+  --card: #1a2332;
+  --accent: #2ecc71;
+  --accent2: #27ae60;
+  --text: #e8f0e8;
+  --muted: #8fa3b0;
+  --border: #2a3a4a;
+  --danger: #e74c3c;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 80px;
+  line-height: 1.4;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(180deg, #0f1419 90%, transparent);
+  padding: 12px 16px 8px;
+}
+h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+.search-box {
+  position: relative;
+}
+#search {
+  width: 100%;
+  padding: 14px 16px 14px 44px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 16px; /* prevents zoom on iOS */
+  outline: none;
+  transition: border-color 0.2s;
+}
+#search:focus { border-color: var(--accent); }
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 18px;
+  pointer-events: none;
+}
+.filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 16px 6px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.filters::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.chip.active {
+  background: var(--accent);
+  color: #0f1419;
+  border-color: var(--accent);
+}
+.stats {
+  display: flex;
+  gap: 12px;
+  padding: 4px 16px 8px;
+  font-size: 12px;
+  color: var(--muted);
+  align-items: center;
+  flex-wrap: wrap;
+}
+.stats span { color: var(--accent); font-weight: 600; }
+.sort-box {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#sort {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  outline: none;
+  max-width: 140px;
+}
+#sort:focus { border-color: var(--accent); }
+main {
+  padding: 0 12px 20px;
+}
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: transform 0.15s;
+}
+.card:active { transform: scale(0.985); }
+.card-header {
+  padding: 14px 16px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.crop-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.badge {
+  background: rgba(46, 204, 113, 0.15);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.card-body {
+  padding: 0 16px 14px;
+}
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+  margin-top: 8px;
+}
+.label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+.value {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+}
+.full { grid-column: 1 / -1; }
+.varieties {
+  font-size: 12.5px;
+  color: #a8c5b0;
+  line-height: 1.35;
+}
+.period {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(46, 204, 113, 0.12);
+  color: var(--accent);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+.empty svg { margin-bottom: 12px; opacity: 0.4; }
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+  z-index: 50;
+}
+.source { color: var(--accent); }
+.highlight { background: rgba(46,204,113,0.25); border-radius: 3px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🌿 Λαχανικά Κύπρου</h1>
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="search" id="search" placeholder="Αναζήτηση είδους ή ποικιλίας..." autocomplete="off" enterkeyhint="search">
+  </div>
+</header>
+
+<div class="filters" id="filters">
+  <button class="chip active" data-filter="all">Όλα</button>
+  <button class="chip" data-filter="greenhouse">Θερμοκήπιο</button>
+  <button class="chip" data-filter="field">Χωράφι</button>
+  <button class="chip" data-filter="leafy">Φυλλώδη</button>
+  <button class="chip" data-filter="root">Ριζώδη</button>
+  <button class="chip" data-filter="fruit">Καρποφόρα</button>
+</div>
+
+<div class="stats">
+  <div>Είδη: <span id="count">0</span></div>
+  <div>Εμφάνιση: <span id="shown">0</span></div>
+  <div class="sort-box">
+    <label for="sort">Σορτ:</label>
+    <select id="sort">
+      <option value="sow-asc" selected>Σπορά (νωρίς→αργά)</option>
+      <option value="sow-desc">Σπορά (αργά→νωρίς)</option>
+      <option value="harvest-asc">Συγκομιδή (νωρίς→αργά)</option>
+      <option value="harvest-desc">Συγκομιδή (αργά→νωρίς)</option>
+      <option value="name-asc">Α → Ω</option>
+      <option value="name-desc">Ω → Α</option>
+      <option value="yield-desc">Απόδοση ↓</option>
+      <option value="yield-asc">Απόδοση ↑</option>
+    </select>
+  </div>
+</div>
+
+<main id="list"></main>
+
+<footer>
+  <span>MOA Cyprus Data</span>
+  <span class="source">Χρήσιμα στοιχεία καλλιέργειας</span>
+</footer>
+
+<script>
+const DATA = [
+  {name:"Αγγούρι θερμοκηπίου καλοκαιρινό", varieties:"Darbi, Fadia, Fenomeno, Gianko, Monir, Pruva, Tuana, Tornac", sow:"Μάρτιος-Μάιος", days:6, depth:"2,5-5", transplant:"-", rows:"130-160", plants:"30-50", seed:"300-400g", density:"1.250-2.550", harvest:"Μάιος-Αύγουστος", yield:"15.000-17.000", life:5, seedsg:"30-50", tags:["greenhouse","fruit"]},
+  {name:"Αγγούρι θερμοκηπίου χειμερινό", varieties:"Green Magic, Kaspian, Mercury, Number 1, Passandra, PS 64", sow:"Αύγουστος-Σεπτέμβριος", days:6, depth:"2,5-5", transplant:"-", rows:"130-160", plants:"30-50", seed:"300-400g", density:"1.250-2.550", harvest:"Οκτώβριος-Φεβρουάριος", yield:"8.000-13.500", life:5, seedsg:"30-50", tags:["greenhouse","fruit"]},
+  {name:"Αγγούρι χωραφιού", varieties:"Lictos, Livas, Ramezz, Tempo, Thamin", sow:"Μάρτιος-Μάιος, Αύγουστος-Σεπτέμβριος", days:6, depth:"2,5-5", transplant:"-", rows:"130-160", plants:"30-50", seed:"300-400g", density:"1.250-2.550", harvest:"Μάιος-Αύγουστος", yield:"3.500", life:5, seedsg:"30-50", tags:["field","fruit"]},
+  {name:"Αγκινάρα", varieties:"Άσπρη Κίτι, Μαύρη Μάμμαρι, Μαρτέζικη (Κίτι), Violet De Provence, Violetta Lunga di Romagna, Gigante di Romagne", sow:"-", days:"-", depth:"7-10", transplant:"Ιούλιος-Αύγουστος", rows:"90-120", plants:"60-90", seed:"-", density:"900-1.800", harvest:"Νοέμβριος-Μάιος", yield:"2.000-2.500", life:"-", seedsg:"-", tags:["field"]},
+  {name:"Αντίδι", varieties:"Monaco, Cigal, Romanesca Da Taglio, Tree Fine Marachaires, Zidane", sow:"Σεπτέμβριος-Μάρτιος", days:5, depth:"1", transplant:"Οκτώβριος-Απρίλιος", rows:"30-45", plants:"25-35", seed:"75-100g", density:"-", harvest:"Νοέμβριος-Μάιος", yield:"9.000 δέσμες", life:5, seedsg:"600", tags:["leafy","field"]},
+  {name:"Γλυκοπατάτα", varieties:"Beauregard, Georgia jet, Evangeline, Murasaki", sow:"Φεβρουάριος-Μάρτιος", days:"-", depth:"-", transplant:"Απρίλιος-Ιούλιος", rows:"100", plants:"25-40", seed:"-", density:"3.000-3.500", harvest:"Αύγουστος-Νοέμβριος", yield:"3.500-4.500", life:"-", seedsg:"-", tags:["root","field"]},
+  {name:"Γλιστρίδα", varieties:"ντόπια πλατύφυλλη, ντόπια στενόφυλλη", sow:"Μάρτιος-Αύγουστος", days:7, depth:"1", transplant:"-", rows:"15", plants:"8", seed:"500g", density:"-", harvest:"Μάιος-Νοέμβριος", yield:"12.000 δέσμες", life:"20-40", seedsg:"2.200-2.500", tags:["leafy","field"]},
+  {name:"Καλαμπόκι", varieties:"Basin R, Landmark, Overland, Sentinel, Tasty sweet", sow:"Μάρτιος-Ιούνιος", days:7, depth:"3-5", transplant:"Απρίλιος-Ιούλιος", rows:"70-100", plants:"20-25", seed:"500-750g", density:"4.000-7.000", harvest:"Ιούνιος-Νοέμβριος", yield:"1.500-2.000", life:1, seedsg:"4-7", tags:["field","fruit"]},
+  {name:"Καρότο", varieties:"Concerto, Nantes, Niagara, Nevis, Napa", sow:"Φεβρουάριος-Απρίλιος, Αύγουστος-Νοέμβριος", days:12, depth:"1-2", transplant:"-", rows:"15", plants:"8", seed:"750-1500g", density:"-", harvest:"Ολόχρονα", yield:"4.000-5.000", life:3, seedsg:"1.400", tags:["root","field"]},
+  {name:"Καρπούζι", varieties:"Crimson sweet, Pegasos, Melania, Centurion", sow:"Νοέμβριος-Ιανουάριος, Μάρτιος-Μάιος", days:5, depth:"3-5", transplant:"-", rows:"180-240", plants:"60-75", seed:"100-200g", density:"600-900", harvest:"Ιούνιος-Σεπτέμβριος", yield:"5.000-7.000", life:"4-5", seedsg:"7-27", tags:["field","fruit"]},
+  {name:"Κόλιανδρος", varieties:"American long, Caribe, ντόπια ποικιλία, Ταμασός", sow:"Αύγουστος-Μάρτιος", days:10, depth:"1-3", transplant:"-", rows:"30-45", plants:"30", seed:"1,5-2kg", density:"-", harvest:"Οκτώβριος-Ιούνιος", yield:"10.000 δέσμες", life:"4-5", seedsg:"-", tags:["leafy","field"]},
+  {name:"Κολοκάσι", varieties:"ντόπιες ποικιλίες", sow:"Μάρτιος-Απρίλιος", days:"-", depth:"10", transplant:"-", rows:"105", plants:"60", seed:"300kg", density:"1.600", harvest:"Σεπτέμβριος-Μάιος", yield:"4.000", life:"-", seedsg:"-", tags:["root","field"]},
+  {name:"Κολοκυθάκι", varieties:"Astia, Casablanca, Clarita, Mikonos, Senator, Sofia, Suberba", sow:"Μάρτιος-Σεπτέμβριος", days:7, depth:"2,5-5", transplant:"-", rows:"120-140", plants:"60", seed:"375-500g", density:"1.100-1.400", harvest:"Μάιος-Νοέμβριος", yield:"3.000", life:"4-5", seedsg:"10", tags:["field","fruit"]},
+  {name:"Κουκί (φρέσκο)", varieties:"ντόπια ποικιλία", sow:"Σεπτέμβριος-Ιανουάριος", days:6, depth:"5-8", transplant:"-", rows:"45-60", plants:"12-18", seed:"18-22kg", density:"-", harvest:"Νοέμβριος-Ιούνιος", yield:"1.000-2.000", life:"4-5", seedsg:"0,5", tags:["field"]},
+  {name:"Κουνουπίδι", varieties:"Arizona, Amerigo, Fargo, Skywalker, Snowball", sow:"Ιούλιος-Οκτώβριος", days:6, depth:"2", transplant:"Αύγουστος-Νοέμβριος", rows:"75-90", plants:"45-60", seed:"50g", density:"2.000-3.000", harvest:"Σεπτέμβριος-Μάιος", yield:"3.500-4.000", life:"4-5", seedsg:"350", tags:["field","leafy"]},
+  {name:"Κουλούμπρα", varieties:"Kossak", sow:"Αύγουστος-Φεβρουάριος", days:5, depth:"2", transplant:"Σεπτέμβριος-Μάρτιος", rows:"40-60", plants:"40-60", seed:"50g", density:"2.800-6.000", harvest:"Οκτώβριος-Μάιος", yield:"1.500-2.000", life:"4-5", seedsg:"400", tags:["field"]},
+  {name:"Κραμπί", varieties:"Farao, Bajonet, Destiny, Thomas", sow:"-", days:6, depth:"2", transplant:"Αύγουστος-Απρίλιος", rows:"45-75", plants:"30-45", seed:"50g", density:"3.000-7.000", harvest:"Ολόχρονα", yield:"3.000-4.000", life:"4-5", seedsg:"300", tags:["field","leafy"]},
+  {name:"Κραμπί κόκκινο", varieties:"Azzuro, Rookie, Romanov, Primero", sow:"-", days:6, depth:"2", transplant:"Αύγουστος-Απρίλιος", rows:"45-75", plants:"30-45", seed:"50g", density:"3.000-7.000", harvest:"Ολόχρονα", yield:"3.000-4.000", life:"4-5", seedsg:"300", tags:["field","leafy"]},
+  {name:"Κραμπί κινέζικο", varieties:"China express, Emiko, Manoko", sow:"Σεπτέμβριος-Δεκέμβριος", days:6, depth:"2", transplant:"Οκτώβριος-Φεβρουάριος", rows:"60-75", plants:"45", seed:"100g", density:"3.000-3.700", harvest:"Νοέμβριος-Απρίλιος", yield:"3.000", life:"3-5", seedsg:"300", tags:["field","leafy"]},
+  {name:"Κρεμμύδι ξηρό (κονάρι)", varieties:"ντόπια ποικιλία", sow:"Ιανουάριος-Φεβρουάριος", days:"-", depth:"3-5", transplant:"-", rows:"15-22", plants:"8-10", seed:"50-75kg", density:"-", harvest:"Ιούνιος-Ιούλιος", yield:"3.000", life:"-", seedsg:"-", tags:["root","field"]},
+  {name:"Κρεμμύδι ξηρό (σπόρος)", varieties:"Ada, Eytan, Mikado, Orlando, Texas grano 502", sow:"Νοέμβριος-Φεβρουάριος", days:10, depth:"1-2", transplant:"-", rows:"15-22", plants:"8-10", seed:"500-750g", density:"-", harvest:"Μάιος-Αύγουστος", yield:"3.500-5.000", life:"1-2", seedsg:"300", tags:["root","field"]},
+  {name:"Κρεμμυδάκι φρέσκο (σπόρος)", varieties:"White Lisbon", sow:"Σεπτέμβριος-Φεβρουάριος", days:10, depth:"1-2", transplant:"-", rows:"15", plants:"2-3", seed:"1,5-3kg", density:"-", harvest:"Νοέμβριος-Μάιος", yield:"10.000-15.000 δέσμες", life:"1-2", seedsg:"300", tags:["leafy","field"]},
+  {name:"Κρεμμυδάκι φρέσκο (κονάρι)", varieties:"ντόπια ποικιλία", sow:"Σεπτέμβριος-Φεβρουάριος", days:"-", depth:"3-5", transplant:"-", rows:"15", plants:"5", seed:"100-150kg", density:"-", harvest:"Οκτώβριος-Μάιος", yield:"10.000-15.000 δέσμες", life:"-", seedsg:"-", tags:["leafy","field"]},
+  {name:"Λάχανο", varieties:"ντόπια ποικιλία, White Silver 2", sow:"Αύγουστος-Μάρτιος", days:7, depth:"3-5", transplant:"Σεπτέμβριος-Απρίλιος", rows:"30-45", plants:"15-22", seed:"1-1,5kg", density:"-", harvest:"Ολόχρονα", yield:"9.000-13.000 δέσμες", life:4, seedsg:"60", tags:["leafy","field"]},
+  {name:"Λαχανάκι Βρυξελλών", varieties:"Franklin, Davlin", sow:"Ιούλιος-Αύγουστος", days:6, depth:"1-2", transplant:"Σεπτέμβριος-Οκτώβριος", rows:"60-75", plants:"45-60", seed:"50g", density:"2.200-3.700", harvest:"Δεκέμβριος-Απρίλιος", yield:"3.000", life:"4-5", seedsg:"300", tags:["field","leafy"]},
+  {name:"Λουβί (φρέσκο)", varieties:"διάφορες ντόπιες (Αργάκας, Μακροθύλακο), Καλιφόρνια Νο 5", sow:"Απρίλιος-Ιούνιος", days:7, depth:"5", transplant:"-", rows:"75", plants:"30-45", seed:"3-4,5kg", density:"-", harvest:"Ιούλιος-Νοέμβριος", yield:"1.500-2.000", life:3, seedsg:"4", tags:["field"]},
+  {name:"Μαϊντανός", varieties:"Gigante d'Italia", sow:"Φεβρουάριος-Μάιος, Σεπτέμβριος-Δεκέμβριος", days:21, depth:"1-2", transplant:"-", rows:"15-45", plants:"15-30", seed:"1kg", density:"-", harvest:"Ολόχρονα", yield:"18.000-25.000 δέσμες", life:"1-2", seedsg:"620", tags:["leafy","field"]},
+  {name:"Μάραθος-Φενόκιο", varieties:"Rondo, Mamuth", sow:"Ιούλιος-Οκτώβριος", days:"-", depth:"1-2", transplant:"Αύγουστος-Νοέμβριος", rows:"60", plants:"15", seed:"100g", density:"11.000", harvest:"Νοέμβριος-Μάρτιος", yield:"4.000", life:4, seedsg:"160", tags:["field"]},
+  {name:"Μαρούλι κεφαλωτό", varieties:"Great lakes 659, Iceberg, Iceking", sow:"Ολόχρονα", days:6, depth:"1-2", transplant:"Οκτώβριος-Μάρτιος", rows:"45", plants:"15-30", seed:"50g", density:"7.500-15.000", harvest:"Νοέμβριος-Απρίλιος", yield:"3.000-4.500", life:4, seedsg:"850", tags:["leafy","field"]},
+  {name:"Μαρούλι «Κος»", varieties:"Bacio, Kasam, Nader, Nogal, Paris island cos, Tamburo, Verde Degli Ortolani", sow:"Ολόχρονα", days:6, depth:"1-2", transplant:"Σεπτέμβριος-Μάιος", rows:"30-45", plants:"15-30", seed:"50g", density:"7.500-22.000", harvest:"Ολόχρονα", yield:"8.000-12.000 δέσμες", life:5, seedsg:"900", tags:["leafy","field"]},
+  {name:"Μαρούλι Lollo", varieties:"Lollo bionda, Lollo rossa, Lollo rosso Fesca, Levistro", sow:"Ολόχρονα", days:6, depth:"1-2", transplant:"Σεπτέμβριος-Μάιος", rows:"30-45", plants:"15-30", seed:"50g", density:"7.500-22.000", harvest:"Ολόχρονα", yield:"8.000-12.000 δέσμες", life:5, seedsg:"900", tags:["leafy","field"]},
+  {name:"Μελιτζάνα", varieties:"Ecavi, Galine, Scorpio, Traviata, Monarca", sow:"Φεβρουάριος-Απρίλιος, Ιούλιος-Αύγουστος", days:10, depth:"1-2", transplant:"Απρίλιος-Μάιος", rows:"90", plants:"60-75", seed:"25g", density:"1.500-1.850", harvest:"Ιούνιος-Δεκέμβριος", yield:"5.000-7.000", life:"4-5", seedsg:"275", tags:["field","fruit"]},
+  {name:"Μπάμια", varieties:"Clemson spineless, Ankur 10, Ankur 40, Anochi", sow:"Μάρτιος-Μάιος", days:10, depth:"2-3", transplant:"-", rows:"60-90", plants:"15-25", seed:"4-5kg", density:"-", harvest:"Ιούνιος-Νοέμβριος", yield:"2.000-3.000", life:2, seedsg:"20", tags:["field","fruit"]},
+  {name:"Μπιζέλι", varieties:"Onward, Rondo, Progress No 9", sow:"Σεπτέμβριος-Φεβρουάριος", days:8, depth:"4-5", transplant:"-", rows:"30-60", plants:"3-5", seed:"10-13kg", density:"-", harvest:"Νοέμβριος-Ιούλιος", yield:"1.500-2.000", life:3, seedsg:"3-10", tags:["field"]},
+  {name:"Μπρόκολο", varieties:"Lord, Marathon, Montop, Parthenon", sow:"Ιούλιος-Οκτώβριος", days:6, depth:"1-2", transplant:"Αύγουστος-Νοέμβριος", rows:"60-75", plants:"45-60", seed:"50g", density:"2.200-3.700", harvest:"Σεπτέμβριος-Απρίλιος", yield:"3.000", life:"3-4", seedsg:"320", tags:["field","leafy"]},
+  {name:"Παντζάρι", varieties:"Detroit 2, Detroit 3, Red Cloud", sow:"Σεπτέμβριος-Οκτώβριος, Φεβρουάριος", days:7, depth:"3-5", transplant:"-", rows:"30-45", plants:"6-8", seed:"1-1,5kg", density:"-", harvest:"Οκτώβριος-Ιούνιος", yield:"3.000-4.000", life:4, seedsg:"60", tags:["root","field"]},
+  {name:"Πατάτα ανοιξιάτικη", varieties:"Σπούντα, Άνναμπελ, Νίκολα, Λιζέτα, Μαρφόνα", sow:"Νοέμβριος-αρχές Φεβρουαρίου", days:14, depth:"15-20", transplant:"-", rows:"60-65", plants:"15-30", seed:"200-250kg", density:"-", harvest:"Μάρτιος-Ιούλιος", yield:"2.000-4.000", life:"-", seedsg:"-", tags:["root","field"]},
+  {name:"Πατάτα φθινοπωρινή", varieties:"Σπούντα, Άνναμπελ, Νίκολα, Λιζέτα, Μαρφόνα", sow:"Αύγουστος-μέσα Οκτωβρίου", days:14, depth:"15-20", transplant:"-", rows:"60-65", plants:"15-30", seed:"200-250kg", density:"-", harvest:"Νοέμβριος-τέλος Φεβρουαρίου", yield:"2.000-4.000", life:"-", seedsg:"-", tags:["root","field"]},
+  {name:"Πεπόνι", varieties:"Alamar, Amal, Ananas, Eden, Lavi gal, Raymond, Polinyka, Utopia", sow:"Μάρτιος-Μάιος", days:4, depth:"2,5-5", transplant:"Απρίλιος-Ιούνιος", rows:"150-180", plants:"60-75", seed:"50-100g", density:"750-1.100", harvest:"Ιούνιος-Σεπτέμβριος", yield:"4.000-5.000", life:"4-5", seedsg:"25-30", tags:["field","fruit"]},
+  {name:"Πιπέρι καυτερό", varieties:"ντόπια, Κενυάτικο, Ιαμαϊκό, Chilly 2123, Chilly 228, Chilly 32, Medina", sow:"Φεβρουάριος-Απρίλιος", days:10, depth:"1-2", transplant:"Απρίλιος-Μάιος", rows:"60", plants:"30", seed:"50g", density:"5.500", harvest:"Ιούλιος-Νοέμβριος", yield:"4.000", life:"3-4", seedsg:"160", tags:["field","fruit"]},
+  {name:"Πιπέρι γλυκό", varieties:"Asideo, California wonder, Festos, Mazurka, Orangery, Quadrado D'Asti Giallo, Robur, Sonar", sow:"Φεβρουάριος-Απρίλιος", days:10, depth:"1-2", transplant:"Απρίλιος-Μάιος", rows:"75", plants:"45-60", seed:"50g", density:"2.200-3.000", harvest:"Ιούλιος-Νοέμβριος", yield:"4.000-4.500", life:"3-4", seedsg:"160", tags:["field","fruit"]},
+  {name:"Πιπέρι κέρατο", varieties:"Sammy, Vaso", sow:"Φεβρουάριος-Απρίλιος", days:10, depth:"1-2", transplant:"Απρίλιος-Μάιος", rows:"75", plants:"45-60", seed:"50g", density:"2.200-3.000", harvest:"Ιούλιος-Νοέμβριος", yield:"4.000-4.500", life:"3-4", seedsg:"160", tags:["field","fruit"]},
+  {name:"Πράσο", varieties:"Bulgaarse Reuzen, Lungo Della Riviera, Lincoln", sow:"Ιούλιος-Οκτώβριος", days:10, depth:"1-2", transplant:"Μάιος-Αύγουστος", rows:"45", plants:"10-15", seed:"100g", density:"15.000-22.000", harvest:"Σεπτέμβριος-Δεκέμβριος", yield:"8.000 δέσμες", life:"1-2", seedsg:"350", tags:["leafy","field"]},
+  {name:"Ραδίκι", varieties:"ντόπια ποικιλία", sow:"Αύγουστος-Μάρτιος", days:10, depth:"1-2", transplant:"Σεπτέμβριος-Μάρτιος", rows:"30-45", plants:"15-22", seed:"50-100g", density:"-", harvest:"Νοέμβριος-Μάιος", yield:"10.000-12.000 δέσμες", life:5, seedsg:"850", tags:["leafy","field"]},
+  {name:"Ρεπάνι", varieties:"Champion, Red Hazera, Gloriette, Varda, Gigantec Siculo", sow:"Ολόχρονα", days:5, depth:"1-2", transplant:"-", rows:"10-22", plants:"4-7", seed:"2-2,5kg", density:"-", harvest:"Ολόχρονα", yield:"10.000 δέσμες", life:"4-5", seedsg:"110", tags:["root","field"]},
+  {name:"Ρόκα", varieties:"ντόπια ποικιλία, Rocket salad", sow:"Ιούλιος-Φεβρουάριος", days:10, depth:"1-2", transplant:"-", rows:"15-45", plants:"8-30", seed:"300-500g", density:"-", harvest:"Σεπτέμβριος-Απρίλιος", yield:"12.000 δέσμες", life:"4-5", seedsg:"-", tags:["leafy","field"]}
+];
+
+const list = document.getElementById('list');
+const searchEl = document.getElementById('search');
+const sortEl = document.getElementById('sort');
+const countEl = document.getElementById('count');
+const shownEl = document.getElementById('shown');
+let activeFilter = 'all';
+
+countEl.textContent = DATA.length;
+
+// Accent-free month map
+const MONTHS = [
+  ['ιανουαριος',1],['ιαν',1],['φεβρουαριος',2],['φεβ',2],
+  ['μαρτιος',3],['μαρ',3],['απριλιος',4],['απρ',4],
+  ['μαιος',5],['μαι',5],['ιουνιος',6],['ιουν',6],
+  ['ιουλιος',7],['ιουλ',7],['αυγουστος',8],['αυγ',8],
+  ['σεπτεμβριος',9],['σεπ',9],['οκτωβριος',10],['οκτ',10],
+  ['νοεμβριος',11],['νοε',11],['δεκεμβριος',12],['δεκ',12]
+];
+
+function stripAccents(s) {
+  return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+
+function parseYield(y) {
+  if (!y || y === '-') return 0;
+  const m = String(y).replace(/\./g,'').match(/(\d+)/);
+  return m ? parseInt(m[1],10) : 0;
+}
+
+// Earliest month: 1-12, 0=ολόχρονα, 99=unknown
+function parseMonth(str) {
+  if (!str || str === '-' || str === '—') return 99;
+  const s = stripAccents(str);
+  if (s.includes('ολοχρονα')) return 0;
+  let best = 99;
+  for (const [name, num] of MONTHS) {
+    if (s.includes(name) && num < best) best = num;
+  }
+  return best;
+}
+
+function highlight(text, q) {
+  if (!q) return text;
+  const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return text.replace(re, '<span class="highlight">$1</span>');
+}
+
+function render(items, q = '') {
+  shownEl.textContent = items.length;
+  if (!items.length) {
+    list.innerHTML = `<div class="empty"><div style="font-size:48px">🌱</div><div>Δεν βρέθηκαν αποτελέσματα</div></div>`;
+    return;
+  }
+  list.innerHTML = items.map(d => `
+    <article class="card">
+      <div class="card-header">
+        <div class="crop-name">${highlight(d.name, q)}</div>
+        <div class="badge">${d.harvest.includes('Ολόχρονα') ? 'Ολόχρονα' : d.harvest.split('-')[0]}</div>
+      </div>
+      <div class="card-body">
+        <div class="full">
+          <div class="label">Κυριότερες ποικιλίες</div>
+          <div class="varieties">${highlight(d.varieties, q)}</div>
+        </div>
+        <div class="row">
+          <div>
+            <div class="label">Σπορά / Φύτευση</div>
+            <div class="value period">${d.sow || '—'}</div>
+          </div>
+          <div>
+            <div class="label">Συγκομιδή</div>
+            <div class="value period">${d.harvest || '—'}</div>
+          </div>
+          <div>
+            <div class="label">Μεταξύ γραμμών (cm)</div>
+            <div class="value">${d.rows || '—'}</div>
+          </div>
+          <div>
+            <div class="label">Μεταξύ φυτών (cm)</div>
+            <div class="value">${d.plants || '—'}</div>
+          </div>
+          <div>
+            <div class="label">Σπόρος / δεκάριο</div>
+            <div class="value">${d.seed || '—'}</div>
+          </div>
+          <div>
+            <div class="label">Φυτά / δεκάριο</div>
+            <div class="value">${d.density || '—'}</div>
+          </div>
+          <div>
+            <div class="label">Απόδοση / δεκάριο</div>
+            <div class="value">${d.yield || '—'}</div>
+          </div>
+          <div>
+            <div class="label">Βάθος σποράς (cm)</div>
+            <div class="value">${d.depth || '—'}</div>
+          </div>
+        </div>
+      </div>
+    </article>
+  `).join('');
+}
+
+function filterData() {
+  const q = searchEl.value.trim().toLowerCase();
+  let filtered = [...DATA];
+  if (activeFilter !== 'all') {
+    filtered = filtered.filter(d => d.tags.includes(activeFilter));
+  }
+  if (q) {
+    filtered = filtered.filter(d =>
+      d.name.toLowerCase().includes(q) ||
+      d.varieties.toLowerCase().includes(q) ||
+      d.sow.toLowerCase().includes(q) ||
+      d.harvest.toLowerCase().includes(q)
+    );
+  }
+
+  // SORT (use transplant if sow missing)
+  const sortVal = sortEl.value;
+  const sowKey = d => {
+    const m = parseMonth(d.sow);
+    return m === 99 ? parseMonth(d.transplant) : m;
+  };
+  filtered.sort((a, b) => {
+    if (sortVal === 'sow-asc') return sowKey(a) - sowKey(b) || a.name.localeCompare(b.name,'el');
+    if (sortVal === 'sow-desc') return sowKey(b) - sowKey(a) || a.name.localeCompare(b.name,'el');
+    if (sortVal === 'harvest-asc') return parseMonth(a.harvest) - parseMonth(b.harvest) || a.name.localeCompare(b.name,'el');
+    if (sortVal === 'harvest-desc') return parseMonth(b.harvest) - parseMonth(a.harvest) || a.name.localeCompare(b.name,'el');
+    if (sortVal === 'name-asc') return a.name.localeCompare(b.name, 'el');
+    if (sortVal === 'name-desc') return b.name.localeCompare(a.name, 'el');
+    if (sortVal === 'yield-desc') return parseYield(b.yield) - parseYield(a.yield);
+    if (sortVal === 'yield-asc') return parseYield(a.yield) - parseYield(b.yield);
+    return 0;
+  });
+
+  render(filtered, q);
+}
+
+searchEl.addEventListener('input', filterData);
+searchEl.addEventListener('search', filterData);
+sortEl.addEventListener('change', filterData);
+
+document.getElementById('filters').addEventListener('click', e => {
+  if (!e.target.classList.contains('chip')) return;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  e.target.classList.add('active');
+  activeFilter = e.target.dataset.filter;
+  filterData();
+});
+
+// Initial render
+filterData();
+
+// Keyboard focus polish
+searchEl.addEventListener('focus', () => {
+  setTimeout(() => window.scrollTo(0, 0), 100);
+});
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+</script>
+</body>
+</html>
